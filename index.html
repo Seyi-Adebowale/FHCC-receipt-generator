@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+    <title>FHCC E-Receipt Generator</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="shortcut icon" href="img/logo.webp" type="image/x-icon" />
+  </head>
+  <style>
+    .content {
+      background-color: white;
+      width: 300px;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin: auto;
+    }
+    button {
+      padding: 15px;
+    }
+    a {
+      color: white;
+      display: block;
+      margin-top: 30px;
+      text-decoration: underline;
+      cursor: pointer;
+      letter-spacing: 1px;
+      font-family: inherit;
+    }
+    a:hover {
+      color: black;
+    }
+  </style>
+  <body>
+    <main>
+      <img src="img/logo.webp" alt="logo" />
+      <h1>FHCC Receipt Generator</h1>
+      <div class="content">
+        <button onclick="location.href='general-receipt.html'">General Receipt</button>
+        <button onclick="location.href='fhcc-receipt.html'">
+          Monthly Receipt
+        </button>
+      </div>
+    </main>
+  </body>
+</html>

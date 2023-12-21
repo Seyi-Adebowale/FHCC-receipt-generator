@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>FHCC E-Receipt Generator</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/receipt-style.css" />
+    <link rel="shortcut icon" href="img/logo.webp" type="image/x-icon" />
+    <style>
+      body {
+        padding: 20px;
+      }
+      input:not([type="checkbox"]) {
+        padding: 8px;
+        width: 100%;
+        margin-bottom: 20px;
+        background-color: white;
+      }
+      label:not(.checkbox-label) {
+        display: block;
+        margin-bottom: 8px;
+        text-align: left;
+      }
+      #services {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+      }
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .checkbox-label input[type="checkbox"] {
+        margin-right: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="img/logo.webp" alt="Logo" />
+    <a href="index.html" class="menu-link">Menu</a>
+    <h1>New FHCC Monthly Receipt</h1>
+    <div class="form" autocomplete="off" id="form">
+      <form>
+        <label for="childName">Child's Name:</label>
+        <select id="childName" name="childName" required>
+          <option value="" selected disabled></option>
+        </select>
+
+        <label for="date">Date:</label>
+        <input type="text" id="date" name="date" readonly />
+
+        <label for="name">Name:</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          autocomplete="off"
+          readonly
+        />
+
+        <label for="amount">Amount:</label>
+        <input
+          type="number"
+          id="amount"
+          name="amount"
+          required
+          autocomplete="off"
+          value="0"
+        />
+
+        <label for="type">Type:</label>
+        <select id="type" name="type" required>
+          <option value="full" selected>Full</option>
+          <option value="part">Part</option>
+        </select>
+
+        <label for="month">For the Month of:</label>
+        <select id="month" name="month" required>
+          <option value="January">January</option>
+          <option value="February">February</option>
+          <option value="March">March</option>
+          <option value="April">April</option>
+          <option value="May">May</option>
+          <option value="June">June</option>
+          <option value="July">July</option>
+          <option value="August">August</option>
+          <option value="September">September</option>
+          <option value="October">October</option>
+          <option value="November">November</option>
+          <option value="December">December</option>
+        </select>
+
+        <label for="year">Year:</label>
+        <input type="text" id="year" name="year" value="2024" />
+
+        <label for="services">Select services that apply:</label>
+        <div id="services">
+          <label for="serviceFee" class="checkbox-label">
+            <input
+              type="checkbox"
+              id="serviceFee"
+              name="serviceFee"
+              value="Service Fee"
+              checked
+            />
+            Service Fee
+          </label>
+
+          <label for="hygieneMaterials" class="checkbox-label">
+            <input
+              type="checkbox"
+              id="hygieneMaterials"
+              name="hygieneMaterials"
+              value="Hygiene Materials"
+            />
+            Hygiene Materials
+          </label>
+
+          <label for="additionalCharges" class="checkbox-label">
+            <input
+              type="checkbox"
+              id="additionalCharges"
+              name="additionalCharges"
+              value="Additional Service Charges"
+            />
+            Additional Service Charges
+          </label>
+        </div>
+
+        <label for="description">Description:</label>
+        <textarea
+          id="description"
+          name="description"
+          rows="4"
+          required
+          autocomplete="off"
+        ></textarea>
+
+        <label for="balance">Balance:</label>
+        <input type="number" id="balance" name="balance" autocomplete="off" />
+
+        <label class="confirm-text"
+          >Please confirm all details are correct before downloading</label
+        >
+
+        <button type="button" id="downloadBtn">Download Receipt</button>
+      </form>
+    </div>
+
+    <div id="receiptPreview">
+      <div class="top">
+        <div class="logo">
+          <img src="img/logo.webp" alt="" />
+        </div>
+        <div class="top2">
+          <div class="heading">Flower House Creche Care</div>
+          <div class="address">
+            50, Eyita-Ojokoro Road, Off Sagamu Road, <br />
+            Ile-Epo Oba, Okada Park, Ikorodu, Lagos <br />
+            <strong>Telephone:</strong> 08022242422, 08072821395 <br />
+            <strong>Website:</strong> flowerhousecrechecare.com.ng
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="body1">
+          <p class="receipt-text">Receipt</p>
+          <p class="entry">
+            <span class="entry-title">Date:</span
+            ><span id="receipt-date" class="entry-field"></span>
+          </p>
+        </div>
+        <div class="body2">
+          <p class="entry">
+            <span class="entry-title">Received from:</span>
+            <span id="receipt-name" class="entry-field"></span>
+          </p>
+          <br />
+          <p class="entry">
+            <span class="entry-title">The sum of:</span
+            ><span id="receipt-amount-words" class="entry-field"></span>
+          </p>
+          <br />
+          <p class="entry">
+            <span class="entry-title"
+              >Being <span id="payment-type">Full</span> Payment for: </span
+            ><span id="payment-desc" class="entry-field"></span>
+          </p>
+          <br />
+        </div>
+        <div class="body3">
+          <p class="entry">
+            <span class="entry-title">Balance:</span> &#x20A6;
+            <span id="receipt-balance" class="entry-field"></span>
+          </p>
+          <br />
+          <div class="amount entry">
+            &#x20A6; <span id="receipt-amount"></span>
+          </div>
+          <div class="signature">
+            <img src="img/signature.png" alt="" class="sign" />
+            <p class="sign-text">For: Flower House Creche Care</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="numberToWords.min.js"></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.8.2/html2pdf.bundle.js"
+      integrity="sha512-t4QeRcqw8DEK6m+S2HxVCTLV4ja+p4l1/HJPUwekNpOV15fAPip7nb1QJJElqxUhVwCq/T9gBTjcWcHVrOHXqw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <script src="script2.js"></script>
+  </body>
+</html>
