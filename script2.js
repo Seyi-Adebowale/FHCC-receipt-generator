@@ -14,14 +14,16 @@ function loadChildNames() {
     "Oke Leonard",
     "Owoyomi Frieda",
     "Adeyemi Zayyana",
-    "Oluwadamilare Fiyinfoluwa",
     "Oloruntoba Tiwaloluwa",
     "Alebiosu Naimat",
     "Olagunju Ifeoluwa",
     "Dele-Aisida Ireoluwa",
     "Adetola Obaloluwa",
     "Ibileke Opeyemi",
-    "Ojajuni Tobiloba"
+    "Ojajuni Tobiloba",
+    "Ewuola Iyiolayemi",
+    "Jinadu Adesewa",
+    "Odefunsho Danielle"
   ];
 
   const sortedChildNames = childNames.sort();
