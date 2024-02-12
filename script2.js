@@ -19,11 +19,13 @@ function loadChildNames() {
     "Olagunju Ifeoluwa",
     "Dele-Aisida Ireoluwa",
     "Adetola Obaloluwa",
-    "Ibileke Opeyemi",
+    "Ibileke Tehila&Tedra",
     "Ojajuni Tobiloba",
     "Ewuola Iyiolayemi",
     "Jinadu Adesewa",
-    "Odefunsho Danielle"
+    "Odefunsho Danielle",
+    "Adebayo Jamal",
+    "Adekan Elizabeth"
   ];
 
   const sortedChildNames = childNames.sort();
