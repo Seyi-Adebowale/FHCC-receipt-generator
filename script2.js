@@ -80,15 +80,6 @@ document.addEventListener("DOMContentLoaded", function () {
   hygieneMaterialsCheckbox.addEventListener("change", updateDescription);
   additionalChargesCheckbox.addEventListener("change", updateDescription);
 
-  // Set the current year in the "Year" field
-//   yearInput.value = getCurrentYear();
-
-  // Function to get the current year
-//   function getCurrentYear() {
-//     const currentDate = new Date();
-//     return currentDate.getFullYear().toString();
-//   }
-
   function updateParentName() {
     const selectedChildOption =
       childNameSelect.options[childNameSelect.selectedIndex];
