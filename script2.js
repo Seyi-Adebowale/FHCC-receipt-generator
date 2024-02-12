@@ -25,7 +25,9 @@ function loadChildNames() {
     "Jinadu Adesewa",
     "Odefunsho Danielle",
     "Adebayo Jamal",
-    "Adekan Elizabeth"
+    "Adekan Daniel&Elizabeth",
+    "Akinmarin Ezekiel",
+    "Igwe Chimkasinma"
   ];
 
   const sortedChildNames = childNames.sort();
