@@ -7,13 +7,13 @@ function loadChildNames() {
     "Omoyeni Celine",
     "Onuh David",
     "Adelakun Emmanuel&Emmanuella",
-    "Oyebode Fareedah",
+    "Kayode Boluwatife",
     "Edwin-Okon Nkenimabasi",
     "Ayodeji Mojisola",
     "Lawal Eriife",
     "Oke Leonard",
     "Owoyomi Frieda",
-    "Adeyemi Zayyana",
+    "Olugbami Timileyin",
     "Oloruntoba Tiwaloluwa",
     "Alebiosu Naimat",
     "Olagunju Ifeoluwa",
@@ -25,7 +25,7 @@ function loadChildNames() {
     "Jinadu Adesewa",
     "Odefunsho Danielle",
     "Adebayo Jamal",
-    "Adekan Daniel&Elizabeth",
+    "Adekan David&Elizabeth",
     "Akinmarin Ezekiel",
     "Igwe Chimkasinma"
   ];
@@ -71,6 +71,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const hygieneMaterialsCheckbox = document.getElementById("hygieneMaterials");
   const additionalChargesCheckbox =
     document.getElementById("additionalCharges");
+  const annualLeviesCheckbox =
+    document.getElementById("annualLevies");  
 
   // Add event listeners for the new fields
   childNameSelect.addEventListener("change", updateParentName);
@@ -79,6 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
   serviceFeeCheckbox.addEventListener("change", updateDescription);
   hygieneMaterialsCheckbox.addEventListener("change", updateDescription);
   additionalChargesCheckbox.addEventListener("change", updateDescription);
+  annualLeviesCheckbox.addEventListener("change", updateDescription);
 
   function updateParentName() {
     const selectedChildOption =
@@ -114,6 +117,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (additionalChargesCheckbox.checked) {
       selectedOptions.push("Additional Service Charges");
+    }
+
+    if (annualLeviesCheckbox.checked) {
+      selectedOptions.push("Annual Levies");
     }
 
     // Create the description based on the selected information
