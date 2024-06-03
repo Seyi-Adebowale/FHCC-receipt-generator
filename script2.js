@@ -10,7 +10,6 @@ function loadChildNames() {
     "Kayode Boluwatife",
     "Edwin-Okon Nkenimabasi",
     "Ayodeji Mojisola",
-    "Lawal Eriife",
     "Oke Leonard",
     "Owoyomi Frieda",
     "Olugbami Timileyin",
