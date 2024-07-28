@@ -8,25 +8,20 @@ function loadChildNames() {
     "Onuh David",
     "Adelakun Emmanuel&Emmanuella",
     "Kayode Boluwatife",
-    "Edwin-Okon Nkenimabasi",
     "Ayodeji Mojisola",
     "Oke Leonard",
     "Owoyomi Frieda",
     "Olugbami Timileyin",
-    "Oloruntoba Tiwaloluwa",
-    "Alebiosu Naimat",
-    "Olagunju Ifeoluwa",
     "Dele-Aisida Ireoluwa",
     "Adetola Obaloluwa",
     "Ibileke Tehila&Tedra",
     "Ojajuni Tobiloba",
-    "Ewuola Iyiolayemi",
     "Jinadu Adesewa",
     "Odefunsho Danielle",
     "Adebayo Jamal",
     "Adekan David&Elizabeth",
-    "Akinmarin Ezekiel",
-    "Igwe Chimkasinma"
+    "Igwe Chimkasinma",
+    "Adebayo Ireoluwa"
   ];
 
   const sortedChildNames = childNames.sort();
