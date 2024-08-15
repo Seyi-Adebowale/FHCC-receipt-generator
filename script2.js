@@ -2,13 +2,11 @@ localStorage.clear();
 function loadChildNames() {
   const childNames = [
     "Olaniyi Akorede",
-    "Musa Ibrahim",
     "Akinduro Oluwafisayomi",
     "Omoyeni Celine",
     "Onuh David",
     "Adelakun Emmanuel&Emmanuella",
     "Kayode Boluwatife",
-    "Ayodeji Mojisola",
     "Oke Leonard",
     "Owoyomi Frieda",
     "Olugbami Timileyin",
