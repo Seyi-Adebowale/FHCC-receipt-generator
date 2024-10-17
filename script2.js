@@ -1,25 +1,23 @@
 localStorage.clear();
 function loadChildNames() {
   const childNames = [
-    "Olaniyi Akorede",
+    "Olaniyi Akorede&Akram",
     "Akinduro Oluwafisayomi",
     "Omoyeni Celine",
     "Onuh David",
     "Adelakun Emmanuel&Emmanuella",
-    "Kayode Boluwatife",
     "Oke Leonard",
     "Owoyomi Frieda",
-    "Olugbami Timileyin",
     "Dele-Aisida Ireoluwa",
     "Adetola Obaloluwa",
     "Ibileke Tehila&Tedra",
     "Ojajuni Tobiloba",
-    "Jinadu Adesewa",
-    "Odefunsho Danielle",
     "Adebayo Jamal",
-    "Adekan David&Elizabeth",
     "Igwe Chimkasinma",
-    "Adebayo Ireoluwa"
+    "Adebayo Ireoluwa",
+    "Alogba Modadeola",
+    "Denis Ugomsinachi",
+    "Akinrogunde Dukiaoluwa"
   ];
 
   const sortedChildNames = childNames.sort();
