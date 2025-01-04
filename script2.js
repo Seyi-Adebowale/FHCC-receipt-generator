@@ -3,7 +3,7 @@ function loadChildNames() {
   const childNames = [
     "Olaniyi Akorede&Akram",
     "Akinduro Oluwafisayomi",
-    "Omoyeni Celine",
+    "The Omoyeni",
     "Onuh David",
     "Adelakun Emmanuel&Emmanuella",
     "Oke Leonard",
