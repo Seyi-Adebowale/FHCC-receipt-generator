@@ -11,7 +11,7 @@ function loadChildNames() {
     "Owoyomi Frieda",
     "Dele-Aisida Ireoluwa",
     "Adetola Obaloluwa",
-    "Ibileke Tehila&Tedra",
+    "Ibileke Tehila & Tedra",
     "Ojajuni Tobiloba",
     "Adebayo Jamal",
     "Igwe Chimkasinma",
