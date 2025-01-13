@@ -1,11 +1,12 @@
 localStorage.clear();
+
 function loadChildNames() {
   const childNames = [
-    "Olaniyi Akorede&Akram",
+    "Olaniyi Akorede & Akram",
     "Akinduro Oluwafisayomi",
-    "The Omoyeni",
+    "Omoyeni Celine, Irvin & Rian",
     "Onuh David",
-    "Adelakun Emmanuel&Emmanuella",
+    "Adelakun Emmanuel & Emmanuella",
     "Oke Leonard",
     "Owoyomi Frieda",
     "Dele-Aisida Ireoluwa",
@@ -17,9 +18,14 @@ function loadChildNames() {
     "Adebayo Ireoluwa",
     "Alogba Modadeola",
     "Denis Ugomsinachi",
-    "Akinrogunde Dukiaoluwa"
+    "Akinrogunde Dukiaoluwa",
+    "Oloruntoba Bryan",
+    "Kareem Mustopha",
+    "James Daniel",
+    "Ajao Zuni",
+    "Agboola Furqan"
   ];
-
+  
   const sortedChildNames = childNames.sort();
 
   const childNameDropdown = document.getElementById("childName");
@@ -29,6 +35,41 @@ function loadChildNames() {
     option.text = name;
     childNameDropdown.add(option);
   });
+}
+
+function saveFormData() {
+  const formData = {
+    date: document.getElementById("date").value,
+    name: document.getElementById("name").value,
+    amount: document.getElementById("amount").value,
+    type: document.getElementById("type").value,
+    description: document.getElementById("description").value,
+    balance: document.getElementById("balance").value,
+    childName: document.getElementById("childName").value,
+    month: document.getElementById("month").value,
+    year: document.getElementById("year").value,
+  };
+
+  localStorage.setItem("formData", JSON.stringify(formData));
+}
+
+// Function to load saved form data from localStorage
+function loadFormData() {
+  const savedFormData = localStorage.getItem("formData");
+
+  if (savedFormData) {
+    const formData = JSON.parse(savedFormData);
+
+    document.getElementById("date").value = formData.date;
+    document.getElementById("name").value = formData.name;
+    document.getElementById("amount").value = formData.amount;
+    document.getElementById("type").value = formData.type;
+    document.getElementById("description").value = formData.description;
+    document.getElementById("balance").value = formData.balance;
+    document.getElementById("childName").value = formData.childName;
+    document.getElementById("month").value = formData.month;
+    document.getElementById("year").value = formData.year;
+  }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -62,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const additionalChargesCheckbox =
     document.getElementById("additionalCharges");
   const annualLeviesCheckbox =
-    document.getElementById("annualLevies");  
+    document.getElementById("annualLevies");
 
   // Add event listeners for the new fields
   childNameSelect.addEventListener("change", updateParentName);
@@ -113,10 +154,14 @@ document.addEventListener("DOMContentLoaded", function () {
       selectedOptions.push("Annual Levies");
     }
 
-    // Create the description based on the selected information
+    // Split the name and keep all parts except the first
+    const nameParts = selectedChildName.split(" ");
+    const remainingName = nameParts.slice(1).join(" "); // Keep all words after the first
+
+    // Create the description
     const descriptionText =
-      selectedChildName.split(" ")[1] +
-      "'s Child Care " +
+      remainingName +
+      "'s Child Care " + // Ensure 's is lowercase
       (selectedOptions.length > 0
         ? selectedOptions.join(" + ") + " for "
         : "") +
@@ -128,147 +173,110 @@ document.addEventListener("DOMContentLoaded", function () {
     descriptionTextarea.value = descriptionText;
   }
 
-  // Trigger the change event initially to set the initial values
-  updateParentName();
-  updateDescription();
-});
 
-document
-  .getElementById("downloadBtn")
-  .addEventListener("click", async function (event) {
-    // Prevent the default form submission behavior
-    event.preventDefault();
+  document
+    .getElementById("downloadBtn")
+    .addEventListener("click", async function (event) {
+      // Prevent the default form submission behavior
+      event.preventDefault();
 
-    // Fetch form values
-    const date = document.getElementById("date").value;
-    const name = document.getElementById("name").value;
-    const amount = document.getElementById("amount").value;
-    const type = document.getElementById("type").value;
-    const description = document.getElementById("description").value;
-    const balance = document.getElementById("balance").value;
+      // Fetch form values
+      const date = document.getElementById("date").value;
+      const name = document.getElementById("name").value;
+      const amount = document.getElementById("amount").value;
+      const type = document.getElementById("type").value;
+      const description = document.getElementById("description").value;
+      const balance = document.getElementById("balance").value;
 
-    const childName = document.getElementById("childName").value;
-    const month = document.getElementById("month").value;
-    const year = document.getElementById("year").value;
+      const childName = document.getElementById("childName").value;
+      const month = document.getElementById("month").value;
+      const year = document.getElementById("year").value;
 
-    const monthAbbreviated = month.substring(0, 3);
+      const monthAbbreviated = month.substring(0, 3);
 
-    // Fetch receipt preview elements
-    const receiptDateElement = document.getElementById("receipt-date");
-    const receiptNameElement = document.getElementById("receipt-name");
-    const paymentTypeElement = document.getElementById("payment-type");
-    const paymentDescElement = document.getElementById("payment-desc");
-    const receiptBalanceElement = document.getElementById("receipt-balance");
-    const receiptAmountWordsElement = document.getElementById(
-      "receipt-amount-words"
-    );
-    const receiptAmountElement = document.getElementById("receipt-amount");
+      // Fetch receipt preview elements
+      const receiptDateElement = document.getElementById("receipt-date");
+      const receiptNameElement = document.getElementById("receipt-name");
+      const paymentTypeElement = document.getElementById("payment-type");
+      const paymentDescElement = document.getElementById("payment-desc");
+      const receiptBalanceElement = document.getElementById("receipt-balance");
+      const receiptAmountWordsElement = document.getElementById(
+        "receipt-amount-words"
+      );
+      const receiptAmountElement = document.getElementById("receipt-amount");
 
-    // Update receipt preview with form values
-    receiptDateElement.textContent = date;
-    receiptNameElement.textContent = capitalizeEachWord(name);
-    paymentTypeElement.textContent = capitalizeFirstLetter(type);
-    paymentDescElement.textContent = capitalizeFirstLetter(description);
-    receiptBalanceElement.textContent = addCommas(balance);
-    receiptAmountWordsElement.textContent = capitalizeEachWord(
-      amountToWords(amount)
-    );
-    receiptAmountElement.textContent = addCommas(amount);
+      // Update receipt preview with form values
+      receiptDateElement.textContent = date;
+      receiptNameElement.textContent = capitalizeEachWord(name);
+      paymentTypeElement.textContent = capitalizeFirstLetter(type);
+      paymentDescElement.textContent = capitalizeFirstLetter(description);
+      receiptBalanceElement.textContent = addCommas(balance);
+      receiptAmountWordsElement.textContent = capitalizeEachWord(
+        amountToWords(amount)
+      );
+      receiptAmountElement.textContent = addCommas(amount);
 
-    // Clone the original receipt preview div
-    var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
+      // Clone the original receipt preview div
+      var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
 
-    // Make the clone div visible before capturing its content
-    cloneDiv.style.display = "block";
+      // Make the clone div visible before capturing its content
+      cloneDiv.style.display = "block";
 
-    // Create a configuration object for html2pdf
-    var config = {
-      margin: [15, 15],
-      filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
-      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-    };
+      // Create a configuration object for html2pdf
+      var config = {
+        margin: [15, 15],
+        filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+      };
 
-    // Use html2pdf to generate a PDF from the content of the clone div
-    const pdf = await html2pdf(cloneDiv, config);
+      // Use html2pdf to generate a PDF from the content of the clone div
+      const pdf = await html2pdf(cloneDiv, config);
 
-    // Append the download link to the body and trigger the download
-    var downloadLink = document.createElement("a");
-    downloadLink.download = config.filename;
+      // Append the download link to the body and trigger the download
+      var downloadLink = document.createElement("a");
+      downloadLink.download = config.filename;
 
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
 
-    // Remove the link from the body
-    document.body.removeChild(downloadLink);
-  });
+      // Remove the link from the body
+      document.body.removeChild(downloadLink);
+    });
 
-  // Function to save form data to localStorage
-function saveFormData() {
-    const formData = {
-      date: document.getElementById("date").value,
-      name: document.getElementById("name").value,
-      amount: document.getElementById("amount").value,
-      type: document.getElementById("type").value,
-      description: document.getElementById("description").value,
-      balance: document.getElementById("balance").value,
-      childName: document.getElementById("childName").value,
-      month: document.getElementById("month").value,
-      year: document.getElementById("year").value,
-    };
   
-    localStorage.setItem("formData", JSON.stringify(formData));
+
+  // Function to add commas to the amount
+  function addCommas(amount) {
+    return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
-  
-  // Function to load saved form data from localStorage
-  function loadFormData() {
-    const savedFormData = localStorage.getItem("formData");
-  
-    if (savedFormData) {
-      const formData = JSON.parse(savedFormData);
-  
-      document.getElementById("date").value = formData.date;
-      document.getElementById("name").value = formData.name;
-      document.getElementById("amount").value = formData.amount;
-      document.getElementById("type").value = formData.type;
-      document.getElementById("description").value = formData.description;
-      document.getElementById("balance").value = formData.balance;
-      document.getElementById("childName").value = formData.childName;
-      document.getElementById("month").value = formData.month;
-      document.getElementById("year").value = formData.year;
+
+  function capitalizeEachWord(str) {
+    return str.replace(/\b\w/g, function (match) {
+      return match.toUpperCase();
+    });
+  }
+
+  // Function to capitalize the first letter of a string
+  function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  function amountToWords(amount) {
+    const numericAmount = parseInt(amount);
+
+    if (!Number.isFinite(numericAmount)) {
+      console.error("Invalid amount:", amount);
+      return "Invalid amount";
     }
+
+    const amountInWords = numberToWords.toWords(numericAmount);
+
+    // Add "and" before the last part
+    const formattedAmount = amountInWords.replace(/(\D|^)(\d+)$/, " and $2");
+
+    return `${formattedAmount} Naira only`;
   }
-
-// Function to add commas to the amount
-function addCommas(amount) {
-  return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function capitalizeEachWord(str) {
-  return str.replace(/\b\w/g, function (match) {
-    return match.toUpperCase();
-  });
-}
-
-// Function to capitalize the first letter of a string
-function capitalizeFirstLetter(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function amountToWords(amount) {
-  const numericAmount = parseInt(amount);
-
-  if (!Number.isFinite(numericAmount)) {
-    console.error("Invalid amount:", amount);
-    return "Invalid amount";
-  }
-
-  const amountInWords = numberToWords.toWords(numericAmount);
-
-  // Add "and" before the last part
-  const formattedAmount = amountInWords.replace(/(\D|^)(\d+)$/, " and $2");
-
-  return `${formattedAmount} Naira only`;
-}
+})

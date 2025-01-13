@@ -124,10 +124,15 @@ function addCommas(amount) {
 }
 
 function capitalizeEachWord(str) {
-  return str.replace(/\b\w/g, function (match) {
+  return str.replace(/\b\w/g, function (match, offset, fullString) {
+    // Check if the match is preceded by an apostrophe
+    if (offset > 0 && fullString[offset - 1] === "'") {
+      return match.toLowerCase(); // Keep it lowercase
+    }
     return match.toUpperCase();
   });
 }
+
 
 // Function to capitalize the first letter of a string
 function capitalizeFirstLetter(str) {
