@@ -23,7 +23,8 @@ function loadChildNames() {
     "Kareem Mustopha",
     "James Daniel",
     "Ajao Zuni",
-    "Agboola Furqan"
+    "Agboola Furqan",
+    "Okenwa Racheal"
   ];
   
   const sortedChildNames = childNames.sort();
