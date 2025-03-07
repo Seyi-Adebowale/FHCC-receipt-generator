@@ -41,7 +41,8 @@ button:hover {
   border: 2px solid green;
 }
 .form {
-  width: 300px;
+  width: 90%;
+  max-width: 360px;
   margin: auto;
   background-color: white;
   padding: 20px;

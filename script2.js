@@ -105,8 +105,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const hygieneMaterialsCheckbox = document.getElementById("hygieneMaterials");
   const additionalChargesCheckbox =
     document.getElementById("additionalCharges");
-  const annualLeviesCheckbox =
-    document.getElementById("annualLevies");
+  const annualDevelopmentLevyCheckbox =
+    document.getElementById("annualDevelopmentLevy");
+    const enrolmentFormsCheckbox = document.getElementById("enrolmentForms");
+
 
   // Add event listeners for the new fields
   childNameSelect.addEventListener("change", updateParentName);
@@ -115,7 +117,8 @@ document.addEventListener("DOMContentLoaded", function () {
   serviceFeeCheckbox.addEventListener("change", updateDescription);
   hygieneMaterialsCheckbox.addEventListener("change", updateDescription);
   additionalChargesCheckbox.addEventListener("change", updateDescription);
-  annualLeviesCheckbox.addEventListener("change", updateDescription);
+  annualDevelopmentLevyCheckbox.addEventListener("change", updateDescription);
+  enrolmentFormsCheckbox.addEventListener("change", updateDescription);
 
   function updateParentName() {
     const selectedChildOption =
@@ -126,7 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const parentNamePrefix = "Mr & Mrs ";
     parentNameInput.value = parentNamePrefix + selectedChildName.split(" ")[0];
 
-    // Update the description whenever the parent name changes
     updateDescription();
   }
 
@@ -139,42 +141,60 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedMonth = monthSelect.value;
     const selectedYear = yearInput.value;
 
-    const selectedOptions = [];
+    const mainFees = [];
+    const postMonthFees = [];
 
     if (serviceFeeCheckbox.checked) {
-      selectedOptions.push("Service Fee");
+      mainFees.push("Child Care Service Fee");
     }
 
     if (hygieneMaterialsCheckbox.checked) {
-      selectedOptions.push("Hygiene Materials");
+      mainFees.push("Hygiene Materials");
     }
 
     if (additionalChargesCheckbox.checked) {
-      selectedOptions.push("Additional Service Charges");
+      mainFees.push("Additional Service Charge");
     }
 
-    if (annualLeviesCheckbox.checked) {
-      selectedOptions.push("Annual Levies");
+    if (annualDevelopmentLevyCheckbox.checked) {
+      postMonthFees.push(`Annual Development Levy (${selectedYear})`);
     }
 
-    // Split the name and keep all parts except the first
+    if (enrolmentFormsCheckbox.checked) {
+      postMonthFees.push("Enrolment & Agreement Forms");
+    }
+
+    // Split the name and keep only the first name
     const nameParts = selectedChildName.split(" ");
-    const remainingName = nameParts.slice(1).join(" "); // Keep all words after the first
+    const firstName = nameParts[0]; // Take only the first word (first name)
 
-    // Create the description
-    const descriptionText =
-      remainingName +
-      "'s Child Care " + // Ensure 's is lowercase
-      (selectedOptions.length > 0
-        ? selectedOptions.join(" + ") + " for "
-        : "") +
-      selectedMonth +
-      " " +
-      selectedYear;
+    // Ensure description is empty unless at least one checkbox is selected
+    if (mainFees.length === 0 && postMonthFees.length === 0) {
+      descriptionTextarea.value = "";
+      return;
+    }
+
+    // Build description
+    let descriptionText = firstName + "'s "; // Use only first name
+
+    if (mainFees.length > 0) {
+      descriptionText += mainFees.join(" + ") + ` for ${selectedMonth} ${selectedYear}`;
+    }
+
+    if (postMonthFees.length > 0) {
+      if (mainFees.length > 0) {
+        descriptionText += ", "; // Add a comma if main fees exist
+      }
+      descriptionText += postMonthFees.join(", ");
+    }
 
     // Update the description textarea
     descriptionTextarea.value = descriptionText;
-  }
+}
+
+
+
+
 
 
   document
