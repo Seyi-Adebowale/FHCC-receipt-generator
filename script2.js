@@ -15,7 +15,6 @@ function loadChildNames() {
     "Ojajuni Tobiloba",
     "Adebayo Jamal",
     "Igwe Chimkasinma",
-    "Adebayo Ireoluwa",
     "Alogba Modadeola",
     "Denis Ugomsinachi",
     "Akinrogunde Dukiaoluwa",
