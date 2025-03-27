@@ -21,7 +21,7 @@ function loadChildNames() {
     "Oloruntoba Bryan",
     "Kareem Mustopha",
     "James Daniel",
-    "Ajao Zuni",
+    "Edwin-Okon Nkenimabasi",
     "Agboola Furqan",
     "Okenwa Racheal",
     "Godspower Rebecca",
@@ -191,11 +191,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update the description textarea
     descriptionTextarea.value = descriptionText;
 }
-
-
-
-
-
 
   document
     .getElementById("downloadBtn")
