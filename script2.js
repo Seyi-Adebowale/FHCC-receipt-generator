@@ -28,7 +28,7 @@ function loadChildNames() {
     "Ewona Zuriel",
     "Akinola Jayden"
   ];
-  
+
   const sortedChildNames = childNames.sort();
 
   const childNameDropdown = document.getElementById("childName");
@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("additionalCharges");
   const annualDevelopmentLevyCheckbox =
     document.getElementById("annualDevelopmentLevy");
-    const enrolmentFormsCheckbox = document.getElementById("enrolmentForms");
+  const enrolmentFormsCheckbox = document.getElementById("enrolmentForms");
 
 
   // Add event listeners for the new fields
@@ -164,18 +164,16 @@ document.addEventListener("DOMContentLoaded", function () {
       postMonthFees.push("Enrolment & Agreement Forms");
     }
 
-    // Split the name and keep only the first name
+    // Extract first name(s) (everything after the first word)
     const nameParts = selectedChildName.split(" ");
-    const firstName = nameParts[0]; // Take only the first word (first name)
+    const firstName = nameParts.slice(1).join(" "); // Remove the surname (first word)
 
-    // Ensure description is empty unless at least one checkbox is selected
     if (mainFees.length === 0 && postMonthFees.length === 0) {
       descriptionTextarea.value = "";
       return;
     }
 
-    // Build description
-    let descriptionText = firstName + "'s "; // Use only first name
+    let descriptionText = `${firstName}'s `;
 
     if (mainFees.length > 0) {
       descriptionText += mainFees.join(" + ") + ` for ${selectedMonth} ${selectedYear}`;
@@ -183,14 +181,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (postMonthFees.length > 0) {
       if (mainFees.length > 0) {
-        descriptionText += ", "; // Add a comma if main fees exist
+        descriptionText += ", ";
       }
       descriptionText += postMonthFees.join(", ");
     }
 
-    // Update the description textarea
     descriptionTextarea.value = descriptionText;
-}
+  }
+
 
   document
     .getElementById("downloadBtn")
@@ -264,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.removeChild(downloadLink);
     });
 
-  
+
 
   // Function to add commas to the amount
   function addCommas(amount) {
