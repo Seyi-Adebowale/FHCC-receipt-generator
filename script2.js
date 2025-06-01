@@ -25,8 +25,7 @@ function loadChildNames() {
     "Agboola Furqan",
     "Okenwa Racheal",
     "Godspower Rebecca",
-    "Ewona Zuriel",
-    "Akinola Jayden"
+    "Ajao Zuni"
   ];
 
   const sortedChildNames = childNames.sort();
