@@ -101,12 +101,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const serviceFeeCheckbox = document.getElementById("serviceFee");
   const hygieneMaterialsCheckbox = document.getElementById("hygieneMaterials");
-  const additionalChargesCheckbox =
-    document.getElementById("additionalCharges");
-  const annualDevelopmentLevyCheckbox =
-    document.getElementById("annualDevelopmentLevy");
+  const additionalChargesCheckbox = document.getElementById("additionalCharges");
+  const annualDevelopmentLevyCheckbox = document.getElementById("annualDevelopmentLevy");
   const enrolmentFormsCheckbox = document.getElementById("enrolmentForms");
-
+  const booksStationeriesCheckbox = document.getElementById("booksStationeries"); // NEW
 
   // Add event listeners for the new fields
   childNameSelect.addEventListener("change", updateParentName);
@@ -117,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
   additionalChargesCheckbox.addEventListener("change", updateDescription);
   annualDevelopmentLevyCheckbox.addEventListener("change", updateDescription);
   enrolmentFormsCheckbox.addEventListener("change", updateDescription);
+  booksStationeriesCheckbox.addEventListener("change", updateDescription); // NEW
 
   function updateParentName() {
     const selectedChildOption =
@@ -154,6 +153,10 @@ document.addEventListener("DOMContentLoaded", function () {
       mainFees.push("Additional Service Charge");
     }
 
+    if (booksStationeriesCheckbox.checked) {
+      postMonthFees.push("Books and Stationeries"); 
+    }
+
     if (annualDevelopmentLevyCheckbox.checked) {
       postMonthFees.push(`Annual Development Levy (${selectedYear})`);
     }
@@ -187,14 +190,11 @@ document.addEventListener("DOMContentLoaded", function () {
     descriptionTextarea.value = descriptionText;
   }
 
-
   document
     .getElementById("downloadBtn")
     .addEventListener("click", async function (event) {
-      // Prevent the default form submission behavior
       event.preventDefault();
 
-      // Fetch form values
       const date = document.getElementById("date").value;
       const name = document.getElementById("name").value;
       const amount = document.getElementById("amount").value;
@@ -208,18 +208,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const monthAbbreviated = month.substring(0, 3);
 
-      // Fetch receipt preview elements
       const receiptDateElement = document.getElementById("receipt-date");
       const receiptNameElement = document.getElementById("receipt-name");
       const paymentTypeElement = document.getElementById("payment-type");
       const paymentDescElement = document.getElementById("payment-desc");
       const receiptBalanceElement = document.getElementById("receipt-balance");
-      const receiptAmountWordsElement = document.getElementById(
-        "receipt-amount-words"
-      );
+      const receiptAmountWordsElement = document.getElementById("receipt-amount-words");
       const receiptAmountElement = document.getElementById("receipt-amount");
 
-      // Update receipt preview with form values
       receiptDateElement.textContent = date;
       receiptNameElement.textContent = capitalizeEachWord(name);
       paymentTypeElement.textContent = capitalizeFirstLetter(type);
@@ -230,13 +226,9 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       receiptAmountElement.textContent = addCommas(amount);
 
-      // Clone the original receipt preview div
       var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
-
-      // Make the clone div visible before capturing its content
       cloneDiv.style.display = "block";
 
-      // Create a configuration object for html2pdf
       var config = {
         margin: [15, 15],
         filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
@@ -246,23 +238,16 @@ document.addEventListener("DOMContentLoaded", function () {
         pagebreak: { mode: ["avoid-all", "css", "legacy"] },
       };
 
-      // Use html2pdf to generate a PDF from the content of the clone div
       const pdf = await html2pdf(cloneDiv, config);
 
-      // Append the download link to the body and trigger the download
       var downloadLink = document.createElement("a");
       downloadLink.download = config.filename;
 
       document.body.appendChild(downloadLink);
       downloadLink.click();
-
-      // Remove the link from the body
       document.body.removeChild(downloadLink);
     });
 
-
-
-  // Function to add commas to the amount
   function addCommas(amount) {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
@@ -273,7 +258,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Function to capitalize the first letter of a string
   function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
@@ -287,10 +271,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const amountInWords = numberToWords.toWords(numericAmount);
-
-    // Add "and" before the last part
     const formattedAmount = amountInWords.replace(/(\D|^)(\d+)$/, " and $2");
 
     return `${formattedAmount} Naira only`;
   }
-})
+});
