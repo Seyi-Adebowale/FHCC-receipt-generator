@@ -24,7 +24,9 @@ function loadChildNames() {
     "Okenwa Racheal",
     "Godspower Rebecca",
     "Ajao Zuni",
-    "Enitan Rachael"
+    "Enitan Rachael",
+    "Nwaokolo Treasure",
+    "Iperepolu Samuel"
   ];
 
   const sortedChildNames = childNames.sort();
