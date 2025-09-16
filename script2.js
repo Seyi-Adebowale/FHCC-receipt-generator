@@ -8,7 +8,6 @@ function loadChildNames() {
     "Owoyomi Frieda",
     "Dele-Aisida Iyanuoluwa",
     "Adetola Obaloluwa",
-    "Ojajuni Tobiloba",
     "Adebayo Jamal",
     "Igwe Chimkasinma",
     "Alogba Modadeola",
