@@ -4,7 +4,6 @@ function loadChildNames() {
   const childNames = [
     "Olaniyi Akram",
     "Onuh David",
-    "Adelakun Emmanuel & Emmanuella",
     "Oke Leonard",
     "Owoyomi Frieda",
     "Dele-Aisida Iyanuoluwa",
@@ -26,7 +25,11 @@ function loadChildNames() {
     "Ajao Zuni",
     "Enitan Rachael",
     "Nwaokolo Treasure",
-    "Iperepolu Samuel"
+    "Iperepolu Samuel",
+    "Zedomi Oluwajoba",
+    "Idowu Oluwatise",
+    "Okafor Naetochukwu",
+    "Oyinloye Balikis"
   ];
 
   const sortedChildNames = childNames.sort();
