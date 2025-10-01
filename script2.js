@@ -26,7 +26,7 @@ function loadChildNames() {
     "Nwaokolo Treasure",
     "Iperepolu Samuel",
     "Zedomi Oluwajoba",
-    "Idowu Oluwatise",
+    "Olajide-Idowu Michael",
     "Okafor Naetochukwu",
     "Oyinloye Balikis"
   ];
