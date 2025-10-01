@@ -13,7 +13,6 @@ function loadChildNames() {
     "Alogba Modadeola",
     "Denis Ugomsinachi",
     "Akinrogunde Dukiaoluwa",
-    "Odefunsho Daniella",
     "Oloruntoba Bryan",
     "Kareem Mustopha",
     "James Daniel",
