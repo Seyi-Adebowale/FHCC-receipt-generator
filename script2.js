@@ -12,13 +12,10 @@ function loadChildNames() {
     "Igwe Chimkasinma",
     "Alogba Modadeola",
     "Denis Ugomsinachi",
-    "Akinrogunde Dukiaoluwa",
     "Oloruntoba Bryan",
-    "Kareem Mustopha",
     "James Daniel",
     "Edwin-Okon Nkenimabasi",
     "Agboola Furqan",
-    "Okenwa Racheal",
     "Godspower Rebecca",
     "Ajao Zuni",
     "Enitan Rachael",
@@ -27,7 +24,9 @@ function loadChildNames() {
     "Zedomi Oluwajoba",
     "Olajide-Idowu Michael",
     "Okafor Naetochukwu",
-    "Oyinloye Balikis"
+    "Oyinloye Balikis",
+    "Adebayo Igbayilola",
+    "Makanjuola Aabidah"
   ];
 
   const sortedChildNames = childNames.sort();
