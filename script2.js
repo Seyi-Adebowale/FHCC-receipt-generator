@@ -10,7 +10,6 @@ function loadChildNames() {
     "Adetola Obaloluwa",
     "Adebayo Jamal",
     "Igwe Chimkasinma",
-    "Alogba Modadeola",
     "Denis Ugomsinachi",
     "Oloruntoba Bryan",
     "James Daniel",
@@ -26,7 +25,9 @@ function loadChildNames() {
     "Okafor Naetochukwu",
     "Oyinloye Balikis",
     "Adebayo Igbayilola",
-    "Makanjuola Aabidah"
+    "Makanjuola Aabidah",
+    "Adegoke Oluwanimisokan",
+    "Daniel-Ojuade "
   ];
 
   const sortedChildNames = childNames.sort();
