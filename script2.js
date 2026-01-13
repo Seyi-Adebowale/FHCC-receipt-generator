@@ -27,7 +27,11 @@ function loadChildNames() {
     "Adebayo Igbayilola",
     "Makanjuola Aabidah",
     "Adegoke Oluwanimisokan",
-    "Daniel-Ojuade "
+    "Daniel-Ojuade Oluwafimihan",
+    "Uweomah Nathaniel",
+    "Olagunju Rejoice",
+    "Owele Rachael",
+    "Bello Outstanding"
   ];
 
   const sortedChildNames = childNames.sort();
