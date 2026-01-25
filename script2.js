@@ -21,7 +21,6 @@ function loadChildNames() {
     "Zedomi Oluwajoba",
     "Olajide-Idowu Michael",
     "Okafor Naetochukwu",
-    "Oyinloye Balikis",
     "Adebayo Igbayilola",
     "Makanjuola Aabidah",
     "Adegoke Oluwanimisokan",
@@ -29,7 +28,9 @@ function loadChildNames() {
     "Uweomah Nathaniel",
     "Olagunju Rejoice",
     "Owele Rachael",
-    "Bello Outstanding"
+    "Bello Outstanding",
+    "Kareem Mustefeem",
+    "Olayiwola Zion"
   ];
 
   const sortedChildNames = childNames.sort();
