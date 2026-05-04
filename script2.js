@@ -9,7 +9,6 @@ function loadChildNames() {
     "Dele-Aisida Iyanuoluwa",
     "Adetola Obaloluwa",
     "Adebayo Jamal",
-    "Igwe Chimkasinma",
     "Oloruntoba Bryan",
     "James Daniel",
     "Agboola Furqan",
@@ -17,12 +16,9 @@ function loadChildNames() {
     "Ajao Zuni",
     "Enitan Rachael",
     "Nwaokolo Treasure",
-    "Iperepolu Samuel",
     "Zedomi Oluwajoba",
     "Olajide-Idowu Michael",
-    "Okafor Naetochukwu",
     "Adebayo Igbayilola",
-    "Makanjuola Aabidah",
     "Adegoke Oluwanimisokan",
     "Daniel-Ojuade Oluwafimihan",
     "Uweomah Nathaniel",
@@ -30,7 +26,10 @@ function loadChildNames() {
     "Owele Rachael",
     "Bello Outstanding",
     "Kareem Mustefeem",
-    "Olayiwola Zion"
+    "Olayiwola Zion",
+    "Adeniyi Israel",
+    "Adekola Abdurrahman",
+    "Adekoya Nathan",
   ];
 
   const sortedChildNames = childNames.sort();
