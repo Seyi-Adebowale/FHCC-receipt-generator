@@ -31,7 +31,7 @@ function loadChildNames() {
     "Adekoya Nathan",
     "Ogunkoya Iremide",
     "Iperepolu Samuel",
-    "Muh'd Awwal Abdullah",
+    "Muh'd-Awwal Abdullah",
     "Sontan Eriifeoluwa"
   ];
 
@@ -260,12 +260,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   }
 
-  function capitalizeEachWord(str) {
-    return str.replace(/\b\w/g, function (match) {
-      return match.toUpperCase();
-    });
-  }
-
+function capitalizeEachWord(str) {
+  return str.replace(/(^|[\s-])([a-z])/g, function(match, separator, letter) {
+    return separator + letter.toUpperCase();
+  });
+}
   function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
