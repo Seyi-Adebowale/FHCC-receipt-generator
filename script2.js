@@ -14,7 +14,7 @@ function loadChildNames() {
     "Agboola Furqan",
     "Godspower Rebecca",
     "Enitan Rachael",
-    "Nwaokolo Treasure",
+    "Nwaokolo Onyinye",
     "Zedomi Oluwajoba",
     "Olajide-Idowu Michael",
     "Adebayo Igbayilola",
@@ -30,7 +30,9 @@ function loadChildNames() {
     "Adekola Abdurrahman",
     "Adekoya Nathan",
     "Ogunkoya Iremide",
-    "Iperepolu Samuel"
+    "Iperepolu Samuel",
+    "Muh'd Awwal Abdullah",
+    "Sontan Eriifeoluwa"
   ];
 
   const sortedChildNames = childNames.sort();
