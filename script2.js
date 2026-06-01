@@ -101,6 +101,29 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("date").value = getCurrentDate();
   document.getElementById("balance").value = "0";
 
+  // Set default month & year based on payment advance rule:
+  // From the 24th, payments are for the next month
+  const now = new Date();
+  const currentDay = now.getDate();
+  let defaultMonth = now.getMonth(); // 0-indexed
+  let defaultYear = now.getFullYear();
+
+  if (currentDay >= 24) {
+    defaultMonth += 1;
+    if (defaultMonth > 11) {
+      defaultMonth = 0; // wrap to January
+      defaultYear += 1;
+    }
+  }
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  document.getElementById("month").value = monthNames[defaultMonth];
+  document.getElementById("year").value = defaultYear;
+
   const childNameSelect = document.getElementById("childName");
   const parentNameInput = document.getElementById("name");
   const monthSelect = document.getElementById("month");
@@ -198,62 +221,137 @@ document.addEventListener("DOMContentLoaded", function () {
     descriptionTextarea.value = descriptionText;
   }
 
-  document
-    .getElementById("downloadBtn")
-    .addEventListener("click", async function (event) {
+  // Required fields validation config
+  const requiredFields = [
+    { id: "childName", label: "Child's Name" },
+    { id: "name", label: "Received from" },
+    { id: "amount", label: "Amount" },
+    { id: "description", label: "Description" },
+  ];
+
+  // Clear error state when user interacts with a field
+  requiredFields.forEach(({ id }) => {
+    const el = document.getElementById(id);
+    const clearError = () => {
+      el.classList.remove("field-error");
+      const errMsg = el.parentElement.querySelector(".error-message");
+      if (errMsg) errMsg.classList.remove("visible");
+    };
+    el.addEventListener("input", clearError);
+    el.addEventListener("change", clearError);
+  });
+
+  function validateForm() {
+    let isValid = true;
+    let firstInvalid = null;
+
+    requiredFields.forEach(({ id, label }) => {
+      const el = document.getElementById(id);
+      const value = el.value.trim();
+
+      // Remove previous error state
+      el.classList.remove("field-error");
+      let errMsg = el.parentElement.querySelector(".error-message");
+
+      if (!value) {
+        isValid = false;
+        el.classList.add("field-error");
+
+        // Create or show error message
+        if (!errMsg) {
+          errMsg = document.createElement("div");
+          errMsg.className = "error-message";
+          el.insertAdjacentElement("afterend", errMsg);
+        }
+        errMsg.textContent = `${label} is required`;
+        errMsg.classList.add("visible");
+
+        if (!firstInvalid) firstInvalid = el;
+      } else if (errMsg) {
+        errMsg.classList.remove("visible");
+      }
+    });
+
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstInvalid.focus();
+    }
+
+    return isValid;
+  }
+
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  downloadBtn.addEventListener("click", async function (event) {
       event.preventDefault();
 
-      const date = document.getElementById("date").value;
-      const name = document.getElementById("name").value;
-      const amount = document.getElementById("amount").value;
-      const type = document.getElementById("type").value;
-      const description = document.getElementById("description").value;
-      const balance = document.getElementById("balance").value;
+      // Validate before proceeding
+      if (!validateForm()) return;
 
-      const childName = document.getElementById("childName").value;
-      const month = document.getElementById("month").value;
-      const year = document.getElementById("year").value;
+      // Set loading state
+      const originalText = downloadBtn.textContent;
+      downloadBtn.disabled = true;
+      downloadBtn.textContent = "Generating...";
+      downloadBtn.classList.add("btn-loading");
 
-      const monthAbbreviated = month.substring(0, 3);
+      try {
+        const date = document.getElementById("date").value;
+        const name = document.getElementById("name").value;
+        const amount = document.getElementById("amount").value;
+        const type = document.getElementById("type").value;
+        const description = document.getElementById("description").value;
+        const balance = document.getElementById("balance").value;
 
-      const receiptDateElement = document.getElementById("receipt-date");
-      const receiptNameElement = document.getElementById("receipt-name");
-      const paymentTypeElement = document.getElementById("payment-type");
-      const paymentDescElement = document.getElementById("payment-desc");
-      const receiptBalanceElement = document.getElementById("receipt-balance");
-      const receiptAmountWordsElement = document.getElementById("receipt-amount-words");
-      const receiptAmountElement = document.getElementById("receipt-amount");
+        const childName = document.getElementById("childName").value;
+        const month = document.getElementById("month").value;
+        const year = document.getElementById("year").value;
 
-      receiptDateElement.textContent = date;
-      receiptNameElement.textContent = capitalizeEachWord(name);
-      paymentTypeElement.textContent = capitalizeFirstLetter(type);
-      paymentDescElement.textContent = capitalizeFirstLetter(description);
-      receiptBalanceElement.textContent = addCommas(balance);
-      receiptAmountWordsElement.textContent = capitalizeEachWord(
-        amountToWords(amount)
-      );
-      receiptAmountElement.textContent = addCommas(amount);
+        const monthAbbreviated = month.substring(0, 3);
 
-      var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
-      cloneDiv.style.display = "block";
+        const receiptDateElement = document.getElementById("receipt-date");
+        const receiptNameElement = document.getElementById("receipt-name");
+        const paymentTypeElement = document.getElementById("payment-type");
+        const paymentDescElement = document.getElementById("payment-desc");
+        const receiptBalanceElement = document.getElementById("receipt-balance");
+        const receiptAmountWordsElement = document.getElementById("receipt-amount-words");
+        const receiptAmountElement = document.getElementById("receipt-amount");
 
-      var config = {
-        margin: [15, 15],
-        filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
-        pagebreak: { mode: ["avoid-all", "css", "legacy"] },
-      };
+        receiptDateElement.textContent = date;
+        receiptNameElement.textContent = capitalizeEachWord(name);
+        paymentTypeElement.textContent = capitalizeFirstLetter(type);
+        paymentDescElement.textContent = capitalizeFirstLetter(description);
+        receiptBalanceElement.textContent = addCommas(balance);
+        receiptAmountWordsElement.textContent = capitalizeEachWord(
+          amountToWords(amount)
+        );
+        receiptAmountElement.textContent = addCommas(amount);
 
-      const pdf = await html2pdf(cloneDiv, config);
+        var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
+        cloneDiv.style.display = "block";
 
-      var downloadLink = document.createElement("a");
-      downloadLink.download = config.filename;
+        var config = {
+          margin: [15, 15],
+          filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+        };
 
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+        const pdf = await html2pdf(cloneDiv, config);
+
+        var downloadLink = document.createElement("a");
+        downloadLink.download = config.filename;
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      } finally {
+        // Reset loading state
+        downloadBtn.disabled = false;
+        downloadBtn.textContent = originalText;
+        downloadBtn.classList.remove("btn-loading");
+      }
     });
 
   function addCommas(amount) {

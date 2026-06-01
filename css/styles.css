@@ -40,6 +40,36 @@ button:hover {
   color: green;
   border: 2px solid green;
 }
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+button:disabled:hover {
+  background-color: green;
+  color: white;
+  border: none;
+}
+.btn-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+.btn-loading:hover::after {
+  border: 2px solid rgba(0,128,0,0.4);
+  border-top-color: green;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 .form {
   width: 90%;
   max-width: 360px;
@@ -59,11 +89,36 @@ input,
 textarea,
 select {
   border: 2px solid green;
+  transition: border-color 0.3s ease;
 }
 input:focus,
 textarea:focus,
 select:focus {
   border-radius: 10px;
+}
+.field-error {
+  border-color: #e53e3e !important;
+  animation: shake 0.4s ease;
+}
+.error-message {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: -16px;
+  margin-bottom: 12px;
+  text-align: left;
+  display: none;
+}
+.error-message.visible {
+  display: block;
+}
+.confirm-text.error-highlight {
+  color: #e53e3e;
+  font-weight: bold;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
 }
 .menu-link{
   margin: auto;
