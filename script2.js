@@ -32,7 +32,8 @@ function loadChildNames() {
     "Ogunkoya Iremide",
     "Iperepolu Samuel",
     "Muh'd-Awwal Abdullah",
-    "Sontan Eriifeoluwa"
+    "Sontan Eriifeoluwa",
+    "Balogun Abdulmalyk"
   ];
 
   const sortedChildNames = childNames.sort();
