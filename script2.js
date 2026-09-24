@@ -167,6 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedYear = yearInput.value;
 
     const mainFees = [];
+    const previousMonthFees = [];
     const postMonthFees = [];
 
     if (serviceFeeCheckbox.checked) {
@@ -177,9 +178,16 @@ document.addEventListener("DOMContentLoaded", function () {
       mainFees.push("Hygiene Materials");
     }
 
+    // Additional service charges are incurred in the month before the one
+    // being paid for, so they are labelled with the previous month
     if (additionalChargesCheckbox.checked) {
-      mainFees.push("Additional Service Charge");
+      previousMonthFees.push("Additional Service Charge");
     }
+
+    const monthIndex = monthNames.indexOf(selectedMonth);
+    const previousMonth = monthNames[(monthIndex + 11) % 12];
+    const previousMonthYear =
+      monthIndex === 0 ? Number(selectedYear) - 1 : selectedYear;
 
     if (booksStationeriesCheckbox.checked) {
       postMonthFees.push("Books and Stationeries"); 
@@ -197,25 +205,26 @@ document.addEventListener("DOMContentLoaded", function () {
     const nameParts = selectedChildName.split(" ");
     const firstName = nameParts.slice(1).join(" "); // Remove the surname (first word)
 
-    if (mainFees.length === 0 && postMonthFees.length === 0) {
+    const parts = [];
+
+    if (mainFees.length > 0) {
+      parts.push(mainFees.join(" + ") + ` for ${selectedMonth} ${selectedYear}`);
+    }
+
+    if (previousMonthFees.length > 0) {
+      parts.push(
+        previousMonthFees.join(" + ") + ` for ${previousMonth} ${previousMonthYear}`
+      );
+    }
+
+    parts.push(...postMonthFees);
+
+    if (parts.length === 0) {
       descriptionTextarea.value = "";
       return;
     }
 
-    let descriptionText = `${firstName}'s `;
-
-    if (mainFees.length > 0) {
-      descriptionText += mainFees.join(" + ") + ` for ${selectedMonth} ${selectedYear}`;
-    }
-
-    if (postMonthFees.length > 0) {
-      if (mainFees.length > 0) {
-        descriptionText += ", ";
-      }
-      descriptionText += postMonthFees.join(", ");
-    }
-
-    descriptionTextarea.value = descriptionText;
+    descriptionTextarea.value = `${firstName}'s ` + parts.join(", ");
   }
 
   // Required fields validation config
