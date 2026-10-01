@@ -27,6 +27,7 @@ document
     // Prevent the default form submission behavior
     event.preventDefault();
 
+    try {
     // Fetch form values
     const date = document.getElementById("date").value;
     const name = document.getElementById("name").value;
@@ -68,6 +69,7 @@ document
     var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
     cloneDiv.style.display = "block";
     document.body.appendChild(cloneDiv);
+    await waitForCloneReady(cloneDiv);
 
     // Create a configuration object for html2pdf
     var config = {
@@ -87,6 +89,21 @@ document
     // sharing from it via WhatsApp sends the blob: URL as the message text
     // instead of attaching the PDF.
     const pdfBlob = await html2pdf().set(config).from(cloneDiv).outputPdf("blob");
+
+    // A correctly rendered receipt is consistently several hundred KB
+    // (the logo/signature images at 2x scale); anything near-empty means
+    // the capture came out blank. Surfacing that here, instead of only
+    // finding out after the file is already shared/saved, is what let us
+    // catch this during testing — leaving it in so a real-device failure
+    // is visible instead of silent.
+    if (pdfBlob.size < 50000) {
+      alert(
+        "Heads up: the generated PDF looks unexpectedly small (" +
+          pdfBlob.size +
+          " bytes), it may be blank. Please screenshot this message and send it back."
+      );
+    }
+
     const pdfFile = new File([pdfBlob], config.filename, { type: "application/pdf" });
 
     if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
@@ -100,7 +117,32 @@ document
     }
 
     cloneDiv.remove();
+    } catch (err) {
+      alert(
+        "Receipt generation failed: " +
+          (err && err.message ? err.message : err) +
+          "\nPlease screenshot this message and send it back."
+      );
+    }
   });
+
+// Force layout before handing off to html2canvas, and make sure every
+// image has actually finished decoding — both can lag a tick behind
+// appendChild on iOS Safari, which otherwise captures whatever
+// half-ready state exists at the moment it's called.
+async function waitForCloneReady(el) {
+  void el.offsetHeight;
+  const images = Array.from(el.querySelectorAll("img"));
+  await Promise.all(
+    images.map((img) => (img.decode ? img.decode().catch(() => {}) : Promise.resolve()))
+  );
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+  await new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(resolve))
+  );
+}
 
 function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob);
