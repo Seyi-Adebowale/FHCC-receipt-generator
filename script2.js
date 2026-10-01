@@ -300,6 +300,7 @@ document.addEventListener("DOMContentLoaded", function () {
       downloadBtn.textContent = "Generating...";
       downloadBtn.classList.add("btn-loading");
 
+      let cloneDiv;
       try {
         const date = document.getElementById("date").value;
         const name = document.getElementById("name").value;
@@ -332,8 +333,16 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         receiptAmountElement.textContent = addCommas(amount);
 
-        var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
+        // html2canvas sizes the capture using the node's live bounding
+        // rect, which is all zeros for a detached node — so the clone has
+        // to actually be in the document or the output PDF comes out
+        // completely blank. Do NOT override position (fixed/absolute):
+        // html2pdf does its own off-screen cloning internally, and an
+        // overridden position on the source node collapses that to a
+        // zero-height capture instead.
+        cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
         cloneDiv.style.display = "block";
+        document.body.appendChild(cloneDiv);
 
         var config = {
           margin: [15, 15],
@@ -366,6 +375,8 @@ document.addEventListener("DOMContentLoaded", function () {
           downloadBlob(pdfBlob, config.filename);
         }
       } finally {
+        if (cloneDiv) cloneDiv.remove();
+
         // Reset loading state
         downloadBtn.disabled = false;
         downloadBtn.textContent = originalText;

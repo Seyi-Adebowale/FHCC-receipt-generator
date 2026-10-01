@@ -58,11 +58,16 @@ document
     );
     receiptAmountElement.textContent = addCommas(amount);
 
-    // Clone the original receipt preview div
+    // Clone the original receipt preview div. html2canvas sizes the
+    // capture using the node's live bounding rect, which is all zeros for
+    // a detached node, so the clone has to actually be in the document or
+    // the output PDF comes out blank. Do NOT override position
+    // (fixed/absolute): html2pdf does its own off-screen cloning
+    // internally, and an overridden position on the source node collapses
+    // that to a zero-height capture instead.
     var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
-
-    // Make the clone div visible before capturing its content
     cloneDiv.style.display = "block";
+    document.body.appendChild(cloneDiv);
 
     // Create a configuration object for html2pdf
     var config = {
@@ -93,6 +98,8 @@ document
     } else {
       downloadBlob(pdfBlob, config.filename);
     }
+
+    cloneDiv.remove();
   });
 
 function downloadBlob(blob, filename) {
