@@ -1,23 +1,5 @@
 localStorage.clear();
 
-// Temporary debug aid: html2canvas's own internal logging only goes to
-// the console, which isn't reachable on a real iPhone without a Mac for
-// Safari's remote inspector. Mirror it into an array we can render
-// on-page instead.
-const __debugLogs = [];
-["log", "info", "debug", "warn", "error"].forEach((level) => {
-  const original = console[level].bind(console);
-  console[level] = function (...args) {
-    __debugLogs.push(
-      "[" + level + "] " + args.map((a) => (a && a.stack) || String(a)).join(" ")
-    );
-    original(...args);
-  };
-});
-window.addEventListener("error", (e) => {
-  __debugLogs.push("[window error] " + e.message);
-});
-
 function loadChildNames() {
   const childNames = [
     "Olaniyi Akram",
@@ -318,7 +300,6 @@ document.addEventListener("DOMContentLoaded", function () {
       downloadBtn.textContent = "Generating...";
       downloadBtn.classList.add("btn-loading");
 
-      let cloneDiv;
       try {
         const date = document.getElementById("date").value;
         const name = document.getElementById("name").value;
@@ -351,88 +332,27 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         receiptAmountElement.textContent = addCommas(amount);
 
-        // html2canvas sizes the capture using the node's live bounding
-        // rect, which is all zeros for a detached node — so the clone has
-        // to actually be in the document or the output PDF comes out
-        // completely blank. Do NOT override position (fixed/absolute):
-        // html2pdf does its own off-screen cloning internally, and an
-        // overridden position on the source node collapses that to a
-        // zero-height capture instead.
-        cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
+        var cloneDiv = document.getElementById("receiptPreview").cloneNode(true);
         cloneDiv.style.display = "block";
-        document.body.appendChild(cloneDiv);
-        await waitForCloneReady(cloneDiv);
 
         var config = {
           margin: [15, 15],
           filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
           image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, logging: true },
+          html2canvas: { scale: 2 },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
-        // Generating the blob ourselves (instead of html2pdf's own
-        // .save(), which the old code relied on implicitly) is what makes
-        // sharing possible below — a Blob/File can be handed to
-        // navigator.share, a blob: URL can't be resolved by anything
-        // outside this page, which is exactly the bug this replaces: on
-        // iPhone, clicking a download link to a blob: URL doesn't save a
-        // file, it opens the PDF in-page, and sharing from there via
-        // WhatsApp sends the blob: URL itself as the message text instead
-        // of attaching the PDF.
-        const pdfWorker = html2pdf().set(config).from(cloneDiv);
-        await pdfWorker.toCanvas();
+        const pdf = await html2pdf(cloneDiv, config);
 
-        // A/B diagnostic: the real-device capture keeps coming back fully
-        // blank with no errors logged, regardless of CORS settings. Render
-        // a second copy with the tiled watermark background (a multi-layer
-        // CSS background-image, a known weak spot for this bundled
-        // html2canvas version on WebKit) stripped out, so one screenshot
-        // tells us whether that's the actual culprit instead of guessing
-        // at one variable per round trip.
-        const simplifiedClone = document.getElementById("receiptPreview").cloneNode(true);
-        simplifiedClone.style.display = "block";
-        simplifiedClone.style.backgroundImage = "none";
-        simplifiedClone.style.backgroundColor = "lightgreen";
-        document.body.appendChild(simplifiedClone);
-        await waitForCloneReady(simplifiedClone);
-        const simplifiedWorker = html2pdf().set(config).from(simplifiedClone);
-        await simplifiedWorker.toCanvas();
-        simplifiedClone.remove();
+        var downloadLink = document.createElement("a");
+        downloadLink.download = config.filename;
 
-        // A correctly rendered receipt is consistently several hundred KB
-        // (the logo/signature images at 2x scale); anything near-empty
-        // means part of the capture came out blank. Show exactly what got
-        // rasterized instead of just the byte count, so a real-device
-        // failure can be diagnosed from a screenshot instead of guessed at.
-        showDebugPreview([
-          { label: "Normal (with watermark)", canvas: pdfWorker.prop.canvas },
-          { label: "Simplified (no watermark bg)", canvas: simplifiedWorker.prop.canvas },
-        ]);
-
-        const pdfBlob = await pdfWorker.outputPdf("blob");
-
-        const pdfFile = new File([pdfBlob], config.filename, { type: "application/pdf" });
-
-        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-          try {
-            await navigator.share({ files: [pdfFile], title: "Receipt" });
-          } catch (shareError) {
-            if (shareError.name !== "AbortError") downloadBlob(pdfBlob, config.filename);
-          }
-        } else {
-          downloadBlob(pdfBlob, config.filename);
-        }
-      } catch (err) {
-        alert(
-          "Receipt generation failed: " +
-            (err && err.message ? err.message : err) +
-            "\nPlease screenshot this message and send it back."
-        );
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
       } finally {
-        if (cloneDiv) cloneDiv.remove();
-
         // Reset loading state
         downloadBtn.disabled = false;
         downloadBtn.textContent = originalText;
@@ -442,99 +362,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function addCommas(amount) {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
-  // Temporary debug aid: shows screenshot-able on-screen previews of the
-  // raw canvas(es) html2canvas produced, right before conversion to PDF —
-  // so a blank/partial capture is visible immediately on the real device
-  // instead of needing another guess-and-check round trip. Accepts either
-  // a single canvas or an array of {label, canvas} for A/B comparisons.
-  function showDebugPreview(items) {
-    try {
-      if (!Array.isArray(items)) items = [{ label: null, canvas: items }];
-
-      const overlay = document.createElement("div");
-      overlay.style.cssText =
-        "position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99999;overflow:auto;" +
-        "display:flex;flex-direction:column;align-items:center;padding:20px;";
-
-      const title = document.createElement("div");
-      title.textContent = "Debug preview — screenshot this and send it back";
-      title.style.cssText = "color:white;font-size:14px;text-align:center;margin-bottom:10px;";
-      overlay.appendChild(title);
-
-      items.forEach(({ label, canvas }) => {
-        const wrap = document.createElement("div");
-        wrap.style.cssText = "margin-bottom:15px;text-align:center;";
-
-        if (label) {
-          const lbl = document.createElement("div");
-          lbl.textContent = label;
-          lbl.style.cssText = "color:#0f0;font-size:12px;margin-bottom:4px;";
-          wrap.appendChild(lbl);
-        }
-
-        const thumb = document.createElement("canvas");
-        const scale = 280 / canvas.width;
-        thumb.width = 280;
-        thumb.height = Math.round(canvas.height * scale);
-        thumb.getContext("2d").drawImage(canvas, 0, 0, thumb.width, thumb.height);
-
-        const img = document.createElement("img");
-        img.src = thumb.toDataURL("image/jpeg", 0.6);
-        img.style.cssText = "max-width:90%;border:2px solid white;";
-        wrap.appendChild(img);
-
-        overlay.appendChild(wrap);
-      });
-
-      const logs = document.createElement("pre");
-      logs.textContent = __debugLogs.join("\n") || "(no console output captured)";
-      logs.style.cssText =
-        "color:#0f0;background:#000;max-width:90%;max-height:25vh;overflow:auto;" +
-        "font-size:10px;padding:8px;margin-top:5px;white-space:pre-wrap;word-break:break-word;";
-      overlay.appendChild(logs);
-
-      const closeBtn = document.createElement("button");
-      closeBtn.textContent = "Close";
-      closeBtn.type = "button";
-      closeBtn.style.cssText = "margin-top:15px;padding:10px 20px;";
-      closeBtn.onclick = () => overlay.remove();
-      overlay.appendChild(closeBtn);
-
-      document.body.appendChild(overlay);
-    } catch (e) {
-      console.error("debug preview failed", e);
-    }
-  }
-
-  // Force layout before handing off to html2canvas, and make sure every
-  // image has actually finished decoding — both can lag a tick behind
-  // appendChild on iOS Safari, which otherwise captures whatever
-  // half-ready state exists at the moment it's called.
-  async function waitForCloneReady(el) {
-    void el.offsetHeight;
-    const images = Array.from(el.querySelectorAll("img"));
-    await Promise.all(
-      images.map((img) => (img.decode ? img.decode().catch(() => {}) : Promise.resolve()))
-    );
-    if (document.fonts && document.fonts.ready) {
-      await document.fonts.ready;
-    }
-    await new Promise((resolve) =>
-      requestAnimationFrame(() => requestAnimationFrame(resolve))
-    );
-  }
-
-  function downloadBlob(blob, filename) {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
   }
 
 function capitalizeEachWord(str) {
