@@ -1,5 +1,23 @@
 localStorage.clear();
 
+// Temporary debug aid: html2canvas's own internal logging only goes to
+// the console, which isn't reachable on a real iPhone without a Mac for
+// Safari's remote inspector. Mirror it into an array we can render
+// on-page instead.
+const __debugLogs = [];
+["log", "info", "debug", "warn", "error"].forEach((level) => {
+  const original = console[level].bind(console);
+  console[level] = function (...args) {
+    __debugLogs.push(
+      "[" + level + "] " + args.map((a) => (a && a.stack) || String(a)).join(" ")
+    );
+    original(...args);
+  };
+});
+window.addEventListener("error", (e) => {
+  __debugLogs.push("[window error] " + e.message);
+});
+
 function loadChildNames() {
   const childNames = [
     "Olaniyi Akram",
@@ -349,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
           margin: [15, 15],
           filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
           image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2 },
+          html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: true },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
@@ -431,13 +449,19 @@ document.addEventListener("DOMContentLoaded", function () {
       label.textContent = "Debug preview — screenshot this and send it back";
       label.style.cssText = "color:white;margin-top:10px;font-size:14px;text-align:center;";
 
+      const logs = document.createElement("pre");
+      logs.textContent = __debugLogs.join("\n") || "(no console output captured)";
+      logs.style.cssText =
+        "color:#0f0;background:#000;max-width:90%;max-height:30vh;overflow:auto;" +
+        "font-size:10px;padding:8px;margin-top:10px;white-space:pre-wrap;word-break:break-word;";
+
       const closeBtn = document.createElement("button");
       closeBtn.textContent = "Close";
       closeBtn.type = "button";
       closeBtn.style.cssText = "margin-top:15px;padding:10px 20px;";
       closeBtn.onclick = () => overlay.remove();
 
-      overlay.append(img, label, closeBtn);
+      overlay.append(img, label, logs, closeBtn);
       document.body.appendChild(overlay);
     } catch (e) {
       console.error("debug preview failed", e);
