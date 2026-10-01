@@ -363,21 +363,17 @@ document.addEventListener("DOMContentLoaded", function () {
         // file, it opens the PDF in-page, and sharing from there via
         // WhatsApp sends the blob: URL itself as the message text instead
         // of attaching the PDF.
-        const pdfBlob = await html2pdf().set(config).from(cloneDiv).outputPdf("blob");
+        const pdfWorker = html2pdf().set(config).from(cloneDiv);
+        await pdfWorker.toCanvas();
 
         // A correctly rendered receipt is consistently several hundred KB
         // (the logo/signature images at 2x scale); anything near-empty
-        // means the capture came out blank. Surfacing that here, instead
-        // of only finding out after the file is already shared/saved,
-        // is what let us catch this during testing — leaving it in so a
-        // real-device failure is visible instead of silent.
-        if (pdfBlob.size < 50000) {
-          alert(
-            "Heads up: the generated PDF looks unexpectedly small (" +
-              pdfBlob.size +
-              " bytes), it may be blank. Please screenshot this message and send it back."
-          );
-        }
+        // means part of the capture came out blank. Show exactly what got
+        // rasterized instead of just the byte count, so a real-device
+        // failure can be diagnosed from a screenshot instead of guessed at.
+        showDebugPreview(pdfWorker.prop.canvas);
+
+        const pdfBlob = await pdfWorker.outputPdf("blob");
 
         const pdfFile = new File([pdfBlob], config.filename, { type: "application/pdf" });
 
@@ -408,6 +404,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function addCommas(amount) {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  // Temporary debug aid: shows a screenshot-able on-screen preview of the
+  // raw canvas html2canvas produced, right before it gets turned into the
+  // PDF — so a blank/partial capture is visible immediately on the real
+  // device instead of needing another guess-and-check round trip.
+  function showDebugPreview(canvas) {
+    try {
+      const thumb = document.createElement("canvas");
+      const scale = 300 / canvas.width;
+      thumb.width = 300;
+      thumb.height = Math.round(canvas.height * scale);
+      thumb.getContext("2d").drawImage(canvas, 0, 0, thumb.width, thumb.height);
+
+      const overlay = document.createElement("div");
+      overlay.style.cssText =
+        "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;" +
+        "display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;";
+
+      const img = document.createElement("img");
+      img.src = thumb.toDataURL("image/jpeg", 0.6);
+      img.style.cssText = "max-width:90%;border:2px solid white;";
+
+      const label = document.createElement("div");
+      label.textContent = "Debug preview — screenshot this and send it back";
+      label.style.cssText = "color:white;margin-top:10px;font-size:14px;text-align:center;";
+
+      const closeBtn = document.createElement("button");
+      closeBtn.textContent = "Close";
+      closeBtn.type = "button";
+      closeBtn.style.cssText = "margin-top:15px;padding:10px 20px;";
+      closeBtn.onclick = () => overlay.remove();
+
+      overlay.append(img, label, closeBtn);
+      document.body.appendChild(overlay);
+    } catch (e) {
+      console.error("debug preview failed", e);
+    }
   }
 
   // Force layout before handing off to html2canvas, and make sure every
