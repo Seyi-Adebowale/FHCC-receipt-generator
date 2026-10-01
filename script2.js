@@ -344,14 +344,27 @@ document.addEventListener("DOMContentLoaded", function () {
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
-        const pdf = await html2pdf(cloneDiv, config);
+        // Generating the blob ourselves (instead of html2pdf's own
+        // .save(), which the old code relied on implicitly) is what makes
+        // sharing possible below — a Blob/File can be handed to
+        // navigator.share, a blob: URL can't be resolved by anything
+        // outside this page, which is exactly the bug this replaces: on
+        // iPhone, clicking a download link to a blob: URL doesn't save a
+        // file, it opens the PDF in-page, and sharing from there via
+        // WhatsApp sends the blob: URL itself as the message text instead
+        // of attaching the PDF.
+        const pdfBlob = await html2pdf().set(config).from(cloneDiv).outputPdf("blob");
+        const pdfFile = new File([pdfBlob], config.filename, { type: "application/pdf" });
 
-        var downloadLink = document.createElement("a");
-        downloadLink.download = config.filename;
-
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+          try {
+            await navigator.share({ files: [pdfFile], title: "Receipt" });
+          } catch (shareError) {
+            if (shareError.name !== "AbortError") downloadBlob(pdfBlob, config.filename);
+          }
+        } else {
+          downloadBlob(pdfBlob, config.filename);
+        }
       } finally {
         // Reset loading state
         downloadBtn.disabled = false;
@@ -362,6 +375,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function addCommas(amount) {
     return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
 function capitalizeEachWord(str) {

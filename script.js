@@ -74,19 +74,37 @@ document
       pagebreak: { mode: ["avoid-all", "css", "legacy"] },
     };
 
-    // Use html2pdf to generate a PDF from the content of the clone div
-    const pdf = await html2pdf(cloneDiv, config);
+    // Generate the PDF as a blob ourselves instead of relying on
+    // html2pdf's own .save() — a Blob/File can be handed to
+    // navigator.share, a blob: URL can't be resolved outside this page.
+    // That's the iPhone bug this replaces: clicking a download link to a
+    // blob: URL doesn't save a file there, it opens the PDF in-page, and
+    // sharing from it via WhatsApp sends the blob: URL as the message text
+    // instead of attaching the PDF.
+    const pdfBlob = await html2pdf().set(config).from(cloneDiv).outputPdf("blob");
+    const pdfFile = new File([pdfBlob], config.filename, { type: "application/pdf" });
 
-    // Append the download link to the body and trigger the download
-    var downloadLink = document.createElement("a");
-    downloadLink.download = config.filename;
-
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-
-    // Remove the link from the body
-    document.body.removeChild(downloadLink);
+    if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+      try {
+        await navigator.share({ files: [pdfFile], title: "Receipt" });
+      } catch (shareError) {
+        if (shareError.name !== "AbortError") downloadBlob(pdfBlob, config.filename);
+      }
+    } else {
+      downloadBlob(pdfBlob, config.filename);
+    }
   });
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
 
 // Function to save form data to localStorage
 function saveFormData() {
