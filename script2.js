@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function () {
           margin: [15, 15],
           filename: `${childName.split(" ")[0]} ${monthAbbreviated}${year} Receipt.pdf`,
           image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: true },
+          html2canvas: { scale: 2, logging: true },
           jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
