@@ -110,12 +110,32 @@ document
     const pdfWorker = html2pdf().set(config).from(cloneDiv);
     await pdfWorker.toCanvas();
 
+    // A/B diagnostic: the real-device capture keeps coming back fully
+    // blank with no errors logged, regardless of CORS settings. Render a
+    // second copy with the tiled watermark background (a multi-layer CSS
+    // background-image, a known weak spot for this bundled html2canvas
+    // version on WebKit) stripped out, so one screenshot tells us whether
+    // that's the actual culprit instead of guessing at one variable per
+    // round trip.
+    const simplifiedClone = document.getElementById("receiptPreview").cloneNode(true);
+    simplifiedClone.style.display = "block";
+    simplifiedClone.style.backgroundImage = "none";
+    simplifiedClone.style.backgroundColor = "lightgreen";
+    document.body.appendChild(simplifiedClone);
+    await waitForCloneReady(simplifiedClone);
+    const simplifiedWorker = html2pdf().set(config).from(simplifiedClone);
+    await simplifiedWorker.toCanvas();
+    simplifiedClone.remove();
+
     // A correctly rendered receipt is consistently several hundred KB
     // (the logo/signature images at 2x scale); anything near-empty means
     // part of the capture came out blank. Show exactly what got
     // rasterized instead of just the byte count, so a real-device failure
     // can be diagnosed from a screenshot instead of guessed at.
-    showDebugPreview(pdfWorker.prop.canvas);
+    showDebugPreview([
+      { label: "Normal (with watermark)", canvas: pdfWorker.prop.canvas },
+      { label: "Simplified (no watermark bg)", canvas: simplifiedWorker.prop.canvas },
+    ]);
 
     const pdfBlob = await pdfWorker.outputPdf("blob");
 
@@ -159,44 +179,64 @@ async function waitForCloneReady(el) {
   );
 }
 
-// Temporary debug aid: shows a screenshot-able on-screen preview of the
-// raw canvas html2canvas produced, right before it gets turned into the
-// PDF — so a blank/partial capture is visible immediately on the real
-// device instead of needing another guess-and-check round trip.
-function showDebugPreview(canvas) {
+// Temporary debug aid: shows screenshot-able on-screen previews of the
+// raw canvas(es) html2canvas produced, right before conversion to PDF —
+// so a blank/partial capture is visible immediately on the real device
+// instead of needing another guess-and-check round trip. Accepts either
+// a single canvas or an array of {label, canvas} for A/B comparisons.
+function showDebugPreview(items) {
   try {
-    const thumb = document.createElement("canvas");
-    const scale = 300 / canvas.width;
-    thumb.width = 300;
-    thumb.height = Math.round(canvas.height * scale);
-    thumb.getContext("2d").drawImage(canvas, 0, 0, thumb.width, thumb.height);
+    if (!Array.isArray(items)) items = [{ label: null, canvas: items }];
 
     const overlay = document.createElement("div");
     overlay.style.cssText =
-      "position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;" +
-      "display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;";
+      "position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99999;overflow:auto;" +
+      "display:flex;flex-direction:column;align-items:center;padding:20px;";
 
-    const img = document.createElement("img");
-    img.src = thumb.toDataURL("image/jpeg", 0.6);
-    img.style.cssText = "max-width:90%;border:2px solid white;";
+    const title = document.createElement("div");
+    title.textContent = "Debug preview — screenshot this and send it back";
+    title.style.cssText = "color:white;font-size:14px;text-align:center;margin-bottom:10px;";
+    overlay.appendChild(title);
 
-    const label = document.createElement("div");
-    label.textContent = "Debug preview — screenshot this and send it back";
-    label.style.cssText = "color:white;margin-top:10px;font-size:14px;text-align:center;";
+    items.forEach(({ label, canvas }) => {
+      const wrap = document.createElement("div");
+      wrap.style.cssText = "margin-bottom:15px;text-align:center;";
+
+      if (label) {
+        const lbl = document.createElement("div");
+        lbl.textContent = label;
+        lbl.style.cssText = "color:#0f0;font-size:12px;margin-bottom:4px;";
+        wrap.appendChild(lbl);
+      }
+
+      const thumb = document.createElement("canvas");
+      const scale = 280 / canvas.width;
+      thumb.width = 280;
+      thumb.height = Math.round(canvas.height * scale);
+      thumb.getContext("2d").drawImage(canvas, 0, 0, thumb.width, thumb.height);
+
+      const img = document.createElement("img");
+      img.src = thumb.toDataURL("image/jpeg", 0.6);
+      img.style.cssText = "max-width:90%;border:2px solid white;";
+      wrap.appendChild(img);
+
+      overlay.appendChild(wrap);
+    });
 
     const logs = document.createElement("pre");
     logs.textContent = __debugLogs.join("\n") || "(no console output captured)";
     logs.style.cssText =
-      "color:#0f0;background:#000;max-width:90%;max-height:30vh;overflow:auto;" +
-      "font-size:10px;padding:8px;margin-top:10px;white-space:pre-wrap;word-break:break-word;";
+      "color:#0f0;background:#000;max-width:90%;max-height:25vh;overflow:auto;" +
+      "font-size:10px;padding:8px;margin-top:5px;white-space:pre-wrap;word-break:break-word;";
+    overlay.appendChild(logs);
 
     const closeBtn = document.createElement("button");
     closeBtn.textContent = "Close";
     closeBtn.type = "button";
     closeBtn.style.cssText = "margin-top:15px;padding:10px 20px;";
     closeBtn.onclick = () => overlay.remove();
+    overlay.appendChild(closeBtn);
 
-    overlay.append(img, label, logs, closeBtn);
     document.body.appendChild(overlay);
   } catch (e) {
     console.error("debug preview failed", e);
