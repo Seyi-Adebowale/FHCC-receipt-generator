@@ -29,7 +29,8 @@ function loadChildNames() {
     "Enebi Treasure",
     "Dahunsi Wuraola",
     "Adeyemo Akorede",
-    "Adenuga Oluwaseyi & Ebunoluwa"
+    "Adenuga Oluwaseyi & Ebunoluwa",
+    "Adeboye Aderinsola"
   ];
 
   const sortedChildNames = childNames.sort();
