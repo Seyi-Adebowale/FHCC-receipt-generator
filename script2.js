@@ -30,7 +30,8 @@ function loadChildNames() {
     "Dahunsi Wuraola",
     "Adeyemo Akorede",
     "Adenuga Oluwaseyi & Ebunoluwa",
-    "Adeboye Aderinsola"
+    "Adeboye Aderinsola",
+    "Abiodun Hadeezah"
   ];
 
   const sortedChildNames = childNames.sort();
