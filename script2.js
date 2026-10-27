@@ -9,7 +9,7 @@ function loadChildNames() {
     "Adebayo Jamal",
     "Oloruntoba Bryan",
     "Agboola Furqan",
-    "Godspower Rebecca",
+    "Godspower Rebecca & Rachael",
     "Enitan Rachael",
     "Nwaokolo Onyinye",
     "Zedomi Oluwajoba",
